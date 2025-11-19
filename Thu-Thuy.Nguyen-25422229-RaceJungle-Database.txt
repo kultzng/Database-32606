@@ -1,0 +1,320 @@
+-- ("5"), Autumn semester, 2024
+-- Name: Thu Thuy Nguyen 
+--
+-- The RaceJungle Database
+-- website: https://racejungle.com/
+-- 
+-- This database demonstrates the Race Jungle website and database. 
+-- Race Jungle was established in 2017 and is one of the first four running race-organized companies in Vietnam. 
+-- The main race series that Race Jungle organized include Ultra Trail, Discovery Marathon, Jungle Paths, Mount Paths, and Fastest X.
+
+DROP view IF EXISTS HGDM24_Customerdetails CASCADE;
+
+DROP table IF EXISTS Race CASCADE;
+DROP table IF EXISTS Register CASCADE;
+DROP table IF EXISTS Customer CASCADE;
+DROP table IF EXISTS Assigned CASCADE;
+DROP table IF EXISTS Staff CASCADE;
+DROP table IF EXISTS Contract CASCADE;
+DROP table IF EXISTS Vendor CASCADE;
+DROP table IF EXISTS BIB CASCADE;
+
+Create table Race
+(raceID		TEXT		NOT NULL,
+raceName	TEXT		NOT NULL,
+raceStartDate	date		NOT NULL,
+raceEndDate	date		NOT NULL,
+raceType	TEXT,
+location	TEXT,
+CONSTRAINT RacePK PRIMARY KEY (raceID),
+
+CONSTRAINT di_table_Race_raceStartDate CHECK (raceStartDate < raceEndDate),
+CONSTRAINT di_table_Race_raceType CHECK (raceType IN ('UT', 'DM', 'JP', 'MP', 'FX')));
+
+Create table Customer
+(customerID			integer		NOT NULL,
+customerName			TEXT		NOT NULL,
+dateOfBirth			date		NOT NULL,
+phoneNumber			integer		NOT NULL,
+email				TEXT		NOT NULL,
+nationality			char(30),
+gender				char(1),
+sizeShirt			char(3),
+emergencyContactPhoneNumber	integer,
+emergencyContactName		TEXT,
+CONSTRAINT CustomerPK PRIMARY KEY (customerID),
+CONSTRAINT di_table_Customer_gender CHECK (gender IN ('M', 'F')),
+CONSTRAINT di_table_Customer_email CHECK ((email LIKE '%@%') AND (email LIKE '%.%')),
+CONSTRAINT di_table_Customer_nationality CHECK (nationality IN (
+     'Afghanistan', 'Akrotiri', 'Albania', 'Algeria', 'Andorra', 'Angola',
+     'Antigua and Barbuda', 'Argentina', 'Armenia', 'Aruba', 'Australia',
+     'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados',
+     'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia',
+     'Bosnia and Herzegorina', 'Botswana', 'Brazil', 'Brunei',
+     'Bulgaria', 'Burkina Faso', 'Burma', 'Burundi', 'Cambodia', 'Cameroon',
+     'Canada', 'Cape Verde', 'Central African Republic', 'Chad', 'Chile',
+     'China', 'Colombia', 'Comoros',
+     'Congo, Democratic Republic of the',
+     'Congo, Republic of the',
+     'Cook Islands',
+     'Costa Rica', 'Cote d''Ivoire', 'Croatia','Cuba', 'Cyprus', 
+     'Czech Republic', 'Denmark', 'Djibouti',
+     'Dominica',
+     'Dominican Republic',
+     'Ecuador', 'Egypt',
+     'El Salvador', 'Equatorial Guinea', 'Eritrea','Estonia','Ethiopia','Fiji',
+     'Finland', 'France', 'French Guiana', 'Gabon', 'Gambia',
+     'Gaza Strip', 'Georgia',
+     'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea',
+     'Guinea-Bissau', 'Guyana', 'Haiti', 'Holy See (Vatican City)',
+     'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq',
+     'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan',
+     'Kenya', 'Kiribati', 'Korea, North',
+     'Korea, South', 'Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia', 'Lebanon',
+     'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg',
+     'Macau', 'Macedonia', 'Madagascar', 'Malawi', 'Malaysia', 'Maldives',
+     'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius',
+     'Mexico', 'Micronesia, Federated States of', 'Moldova', 'Monaco',
+     'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Namibia', 'Nauru',
+     'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria',
+     'Niue', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Panama',
+     'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland',
+     'Portugal', 'Puerto Rico', 'Qatar', 'Romania', 'Russia', 'Rwanda',
+     'Saint Kitts and Nevis', 'Saint Lucia',
+     'Saint Vincent and the Grenadines','Samoa', 'San Marino',
+     'Sao Tome and Principe', 'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles',
+     'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands',
+     'Somalia', 'South Africa', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan',
+     'Suriname', 'Swaziland', 'Sweden', 'Switzerland', 'Syria',
+     'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste',
+     'Togo', 'Tokelau', 'Tonga', 'Trinidad & Tobago', 'Tunisia', 'Turkey',
+     'Turkmenistan', 'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates',
+     'United Kingdom', 'United States of America', 'Uruguay', 'Uzbekistan',
+     'Vanuatu', 'Venezuela', 'Vietnam', 'West Bank', 'Western Sahara',
+     'Yemen', 'Zambia', 'Zimbabwe')),
+CONSTRAINT di_table_Customer_sizeShirt CHECK (sizeShirt IN ('XXS','XS','S','M','L','XL','XXL','3XL')));
+
+Create table Register
+(transactionID		TEXT		NOT NULL,
+raceID			TEXT,
+customerID		integer,
+transactionAmount	integer,
+transactionDate		date,
+paymentType		TEXT,
+ 
+PRIMARY KEY (transactionID),
+--CONSTRAINT CustomerFK FOREIGN KEY (customerID) REFERENCES Customer(customerID)
+--	ON DELETE CASCADE
+-- 	ON UPDATE CASCADE,
+--CONSTRAINT CustomerFK FOREIGN KEY (raceID) REFERENCES Race(raceID)
+	--ON DELETE CASCADE
+  	--ON UPDATE CASCADE,
+CONSTRAINT di_table_Register_paymentType CHECK (paymentType IN ('VM', 'BT', 'OP', 'PP')));
+
+
+Create table Staff
+(staffID	integer		NOT NULL,
+staffName	TEXT		NOT NULL,
+dateOfBirth	date,
+phoneNumber	integer		NOT NULL,
+email		TEXT		NOT NULL,
+gender		char(1),
+sizeShirt	char(3),																
+CONSTRAINT StaffPK PRIMARY KEY (staffID),
+
+CONSTRAINT di_table_Staff_gender CHECK (gender IN ('M','F')),
+CONSTRAINT di_table_Staff_email CHECK ((email LIKE '%@%') AND (email LIKE '%.%')),
+CONSTRAINT di_table_Staff_sizeShirt CHECK (sizeShirt IN ('XXS','XS','S','M','L','XL','XXL','3XL')));
+
+Create table Assigned
+(no		integer		NOT NULL,
+raceID		TEXT,
+staffID		integer,
+role		char(10),
+CONSTRAINT AssignedPK PRIMARY KEY (no),
+--CONSTRAINT AssignedFK FOREIGN KEY (staffID) REFERENCES Staff(staffID)
+--	ON DELETE CASCADE
+--  	ON UPDATE CASCADE,
+--CONSTRAINT AssignedFK FOREIGN KEY (raceID) REFERENCES Race(raceID)
+--	ON DELETE CASCADE
+--  	ON UPDATE CASCADE,
+CONSTRAINT di_table_Assigned_role CHECK (role IN ('Leader','Crew','Volunteer')));
+
+
+Create table Vendor
+(vendorID	integer		NOT NULL,
+vendorName	TEXT		NOT NULL,
+phoneNumber	integer		NOT NULL,
+email		TEXT		NOT NULL,
+address		TEXT,
+TaxNumber	integer,
+accountNumber	integer,
+type		TEXT,
+productName	TEXT,
+price		integer,
+unit		TEXT,																		
+CONSTRAINT VendorPK PRIMARY KEY (vendorID),
+
+CONSTRAINT di_table_Vendor_email CHECK ((email LIKE '%@%') AND (email LIKE '%.%')));									
+Create table Contract
+(contractNumber	TEXT	NOT NULL,
+vendorID	integer,
+raceID		TEXT,
+contractValue	integer,
+CONSTRAINT ContractPK PRIMARY KEY (contractNumber),
+--CONSTRAINT ContractFK FOREIGN KEY (vendorID) REFERENCES Vendor(vendorID)
+	--ON DELETE CASCADE
+  	--ON UPDATE CASCADE,
+--CONSTRAINT ContractFK FOREIGN KEY (raceID) REFERENCES Race(raceID)
+--	ON DELETE CASCADE
+  --	ON UPDATE CASCADE,
+CONSTRAINT di_table_Contract_contractValue CHECK (contractValue > 0));
+
+Create table BIB
+(BIBcode	TEXT 		NOT NULL,
+BIBnumber	integer		NOT NULL,
+raceID		TEXT,
+distance	integer,
+CONSTRAINT BIBPK PRIMARY KEY (BIBcode),	
+--CONSTRAINT BIBFK FOREIGN KEY (raceID) REFERENCES Race(raceID)
+	--ON DELETE CASCADE
+  	--ON UPDATE CASCADE,					
+CONSTRAINT di_table_BIB_BIBnumber CHECK (BIBnumber > 0));
+
+	
+
+CREATE VIEW HGDM24_Customerdetails AS
+SELECT c.customerName, c.phoneNumber, c.email, c.gender, re.transactionID, r.raceName 
+FROM Customer c, Register re, Race r
+WHERE re.raceID = r.raceID
+AND r.raceID = 'HGDM24'
+AND re.customerID = c.customerID
+ORDER BY customerName;
+
+										
+
+INSERT INTO Race VALUES('CPJP24', 'Cuc Phuong Jungle Path 2024', '2024-04-06', '2024-04-07', 'JP', 'Cuc Phuong');
+INSERT INTO Race VALUES('CTJP24', 'Cat Tien Jungle Path 2024', '2024-05-15', '2024-05-16', 'JP', 'Cat Tien');
+INSERT INTO Race VALUES('FMP24', 'Fansipan Mouth Path 2024', '2024-11-20', '2024-11-21', 'MP', 'Fansipan');
+INSERT INTO Race VALUES('MSMP24', 'Mau Son Mouth Path 2024', '2024-12-01', '2024-12-02', 'MP', 'Mau Son');
+INSERT INTO Race VALUES('CBUT24', 'Cao Bang Ultra Trail 2024', '2024-07-30', '2024-08-04', 'UT', 'Cao Bang');
+INSERT INTO Race VALUES('BSUT24', 'Bac Son Ultra Trail 2024', '2024-10-11', '2024-10-12', 'UT', 'Bac Son');
+INSERT INTO Race VALUES('HGDM24', 'Ha Giang Discovery Marathon 2024', '2024-10-05', '2024-10-06', 'DM', 'Ha Giang');
+INSERT INTO Race VALUES('QBDM24', 'Quang Binh Discovery Marathon 2024', '2024-03-09', '2024-03-10', 'DM', 'Quang Binh');
+INSERT INTO Race VALUES('CBFX24', 'Cat Ba Fastest X 2024', '2024-03-30', '2024-03-31', 'FX', 'Cat Ba');
+INSERT INTO Race VALUES('VFX24', 'Viettel Fastest X 2024', '2024-09-20', '2024-09-21', 'FX');
+
+
+INSERT INTO Register VALUES('9X023K856', 'CPJP24', 575546439, 50, '2024-01-05', 'VM');
+INSERT INTO Register VALUES('21D376F27', 'CTJP24', 984124428, 50, '2024-03-01', 'VM');
+INSERT INTO Register VALUES('R565R0377', 'CBUT24', 622717895, 100, '2024-02-02', 'BT');
+INSERT INTO Register VALUES('83T37811Y', 'MSMP24', 816003534, 50, '2023-12-23', 'OP');
+INSERT INTO Register VALUES('R65021G02', 'CPJP24', 176939411, 250, '2024-01-12', 'OP');
+INSERT INTO Register VALUES('2J25494U2', 'HGDM24', 516497348, 150, '2024-04-04', 'BT');
+INSERT INTO Register VALUES('4BH523872', 'QBDM24', 434864165, 100, '2024-01-15', 'BT');
+INSERT INTO Register VALUES('683UR0256', 'VFX24', 704093941, 150, '2024-01-29', 'VM');
+INSERT INTO Register VALUES('U3827Z906', 'HGDM24', 636391375, 50, '2024-04-20', 'BT');
+INSERT INTO Register VALUES('7782446UE', 'MSMP24', 215352591, 250, '2024-03-15', 'PP');
+INSERT INTO Register VALUES('G3359K646', 'CBUT24', 176939411, 1000, '2024-02-18', 'BT');
+INSERT INTO Register VALUES('4410UY963', 'BSUT24', 516497348, 50, '2024-03-08', 'VM');
+INSERT INTO Register VALUES('2IO401111', 'HGDM24', 434864165, 100, '2024-03-21', 'VM');
+INSERT INTO Register VALUES('467997U5P', 'QBDM24', 415218400, 100, '2023-11-29', 'BT');
+INSERT INTO Register VALUES('3K228G960', 'CBFX24', 310961774, 150, '2023-11-18', 'PP');
+INSERT INTO Register VALUES('502E3Y738', 'VFX24', 992392493, 50, '2024-02-09', 'OP');
+INSERT INTO Register VALUES('TY5291400', 'HGDM24', 785747286, 100, '2024-04-01', 'VM');
+INSERT INTO Register VALUES('2IO401411', 'HGDM24', 434864165, 200, '2024-03-21', 'VM');
+
+
+INSERT INTO Customer VALUES(575546439, 'Tran Ngoc Minh', '2004-01-05', 0987654321, 'bluemoon.night@gmail.com', 'Vietnam', 'F','XS', 0987654321, 'Nguyen Minh Anh');
+INSERT INTO Customer VALUES(984124428, 'Le Hoang Anh', '1989-03-01', 0912345678, 'wandering.coder@gmail.com', 'Vietnam', 'M', 'S', 0912345678, 'Le Hoang Long');
+INSERT INTO Customer VALUES(622717895, 'Nguyen Phuong Vy', '1970-03-02', 0900987654, 'sunshine.baker@gmail.com', 'Vietnam', 'M', 'M', 0900987654, 'Tran Ngoc Mai');
+INSERT INTO Customer VALUES(816003534, 'Dao Hai Nam', '1983-03-03', 0956321478, 'happy.trekker@gmail.com', 'Vietnam', 'F', 'L', 0956321478, 'Pham Thu Ha');
+INSERT INTO Customer VALUES(809170736, 'Qiwei Chen', '1990-03-04', 0937182946, 'curious.cat@gmail.com', 'China', 'M', 'XXL', 0937182946, 'Dao Quang Huy');
+INSERT INTO Customer VALUES(704093941, 'Ho Mai Trang', '1991-03-05', 0924681035, 'stargazer.88@gmail.com', 'Vietnam', 'F', 'M', 0924681035, 'Bui Phuong Linh');
+INSERT INTO Customer VALUES(636391375, 'Bui Khanh Duong', '2000-03-06', 0998523107, 'bookworm.life@gmail.com', 'Vietnam','F', '3XL',	0998523107, 'Ho Chi Minh');
+INSERT INTO Customer VALUES(215352591, 'Duong Lan Chi', '1988-03-07', 0971456293, 'melody.maker@gmail.com', 'Vietnam', 'M', 'M', 0971456293, 'Vo Thi Thanh Thao');
+INSERT INTO Customer VALUES(376231583, 'Vo Minh Quan', '1985-03-08', 0906831752, 'green.thumb@gmail.com', 'Vietnam', 'F', 'M', 0906831752, 'Duong Van Nam');
+INSERT INTO Customer VALUES(529375001, 'Ly Song Ha', '1993-03-09', 0943290168, 'history.buff@gmail.com', 'Vietnam', 'F', 'S', 0943290168, 'Ly Lan Huong');
+INSERT INTO Customer VALUES(785747286, 'Miyuki Toshida', '1994-03-10', 0965107832, 'coffee.lover@gmail.com', 'Japan', 'M', 'M', 0965107832, 'Nguyen Khanh Vy');
+INSERT INTO Customer VALUES(176939411, 'Phan Nhat Minh', '1994-03-11', 0918472590, 'tech.wiz@gmail.com', 'Vietnam', 'M', 'M', 0918472590, 'Le Dinh Trung');
+INSERT INTO Customer VALUES(516497348, 'Trinh Diep Anh', '1995-03-12', 0982395601, 'travel.addict@gmail.com', 'Vietnam', 'M', 'M', 0982395601, 'Tran Nhat Minh');
+INSERT INTO Customer VALUES(434864165, 'Luu Minh Nguyet', '1992-03-13', 0959710463, 'language.learner@gmail.com', 'Vietnam', 'F', 'L', 0959710463, 'Pham Thao Vy');
+INSERT INTO Customer VALUES(415218400, 'Cao Thanh Binh', '1991-03-14', 0930168274, 'yoga.enthusiast@gmail.com', 'Vietnam', 'M', 'S', 0930168274, 'Dao Manh Hiep');
+INSERT INTO Customer VALUES(228821041, 'Nguyen Khanh Linh', '1989-03-15', 0976423815, 'paintbrush.dreams@gmail.com', 'Vietnam', 'F', 'L', 0976423815, 'Bui Thu Thuy');
+INSERT INTO Customer VALUES(310961774, 'Duong Tu Anh', '1988-03-16', 0903581926, 'midnight.reader@gmail.com', 'Vietnam', 'F', 'XXS', 0903581926, 'Ho Xuan Mai');
+INSERT INTO Customer VALUES(992392493, 'Vu Hoang Long', '1991-03-05', 0940975368, 'nature.walker@gmail.com', 'Vietnam', 'M', 'XL', 0940975368, 'Vo Minh Duc');
+
+
+INSERT INTO Assigned VALUES(1, 'CPJP24', 802431975, 'Leader');
+INSERT INTO Assigned VALUES(2, 'HGDM24', 802431975, 'Crew');
+INSERT INTO Assigned VALUES(3, 'QBDM24', 756820683, 'Leader');
+INSERT INTO Assigned VALUES(4, 'VFX24', 176627184, 'Volunteer');
+INSERT INTO Assigned VALUES(5, 'HGDM24', 793771114, 'Volunteer');
+INSERT INTO Assigned VALUES(6, 'MSMP24', 466281467, 'Volunteer');
+INSERT INTO Assigned VALUES(7, 'CBUT24', 471381103, 'Volunteer');
+INSERT INTO Assigned VALUES(8, 'BSUT24', 940904632, 'Crew');
+INSERT INTO Assigned VALUES(9, 'HGDM24', 756820683, 'Leader');
+INSERT INTO Assigned VALUES(10, 'HGDM24', 940904632, 'Crew');
+INSERT INTO Assigned VALUES(11,	'HGDM24', 525013866, 'Crew');
+
+
+
+INSERT INTO Staff VALUES(802431975, 'Nguyen Phuong Vy', '2004-01-05', 0987654321, 'bluemoon.night@gmail.com', 'F', 'M');
+INSERT INTO Staff VALUES(359251868, 'Le Thanh Hien', '1989-03-01', 0912345678, 'wandering.coder@gmail.com', 'M', 'M');
+INSERT INTO Staff VALUES(603838909, 'Tran Quoc Bao', '1970-03-02', 0900987654, 'sunshine.baker@gmail.com', 'M', 'L');
+INSERT INTO Staff VALUES(756820683, 'Pham Minh Duc', '1983-03-03', 0956321478, 'happy.trekker@gmail.com', 'F', 'L');
+INSERT INTO Staff VALUES(705300073, 'Dao Ngoc Lan', '1990-03-04', 0937812569, 'curious.cat@gmail.com', 'F', 'XL');
+INSERT INTO Staff VALUES(709354729, 'Bui Trong Nghia', '1991-03-05', 0924108357, 'stargazer.88@gmail.com', 'M', 'XL');
+INSERT INTO Staff VALUES(688536487, 'Ho Mai Khanh', '2000-03-06', 0968532140, 'bookworm.life@gmail.com', 'F', 'S');
+INSERT INTO Staff VALUES(176627184, 'Vo Minh Chau', '1988-03-07', 0949721635, 'melody.maker@gmail.com', 'M', 'M');
+INSERT INTO Staff VALUES(793771114, 'Duong Thu Thao', '1985-03-08', 0910387246, 'green.thumb@gmail.com', 'F', 'M');
+INSERT INTO Staff VALUES(466281467, 'Ly Manh Quan', '1993-03-09', 0975214893, 'history.buff@gmail.com', 'M', 'S');
+INSERT INTO Staff VALUES(471381103, 'Nguyen Hai Binh', '1994-03-10', 0908643157, 'coffee.lover@gmail.com', 'M', 'L');
+INSERT INTO Staff VALUES(817142629, 'Le Thi Ngoc Tram', '1994-03-11', 0932971486, 'tech.wiz@gmail.com', 'F', 'M');
+INSERT INTO Staff VALUES(940904632, 'Tran Diem My', '1995-03-12', 0951407238, 'travel.addict@gmail.com', 'F', 'L');
+INSERT INTO Staff VALUES(525013866, 'Pham Anh Khoa', '1994-03-11', 0986135724, 'language.learner@gmail.com', 'M', 'L');
+
+
+INSERT INTO BIB VALUES('875FH4295', 50008, 'CPJP24', 5);
+INSERT INTO BIB VALUES('2R702J876', 50008, 'HGDM24', 5);
+INSERT INTO BIB VALUES('821Y4K144', 50100, 'QBDM24', 5);
+INSERT INTO BIB VALUES('4023JM467', 10015, 'VFX24', 10);
+INSERT INTO BIB VALUES('3749521UC', 10028, 'HGDM24', 10);
+INSERT INTO BIB VALUES('48320T56Z', 10123, 'MSMP24', 10);
+INSERT INTO BIB VALUES('1W368A015', 25002, 'CBUT24', 25);
+INSERT INTO BIB VALUES('520505XA9', 25018, 'BSUT24', 25);
+INSERT INTO BIB VALUES('QV4609503', 25018, 'HGDM24', 25);
+INSERT INTO BIB VALUES('6501G774N', 25032, 'CPJP24', 25);
+INSERT INTO BIB VALUES('432158D8S', 25106, 'CTJP24', 25);
+INSERT INTO BIB VALUES('944F8L981', 42003, 'CBUT24', 42);
+INSERT INTO BIB VALUES('7E69R9455', 42105, 'MSMP24', 42);
+INSERT INTO BIB VALUES('A8S919670', 42115, 'CPJP24', 42);
+INSERT INTO BIB VALUES('24F16J170', 70001, 'HGDM24', 70);
+INSERT INTO BIB VALUES('12V60H578', 70080, 'QBDM24', 70);
+
+
+INSERT INTO Contract VALUES('RJ-HG-01', 286306521, 'HGDM24', 15000);
+INSERT INTO Contract VALUES('RJ-HG-02',	203524182, 'HGDM24', 20000);
+INSERT INTO Contract VALUES('RJ-HG-03',	554681169, 'HGDM24', 1000);
+INSERT INTO Contract VALUES('RJ-HG-04',	172727832, 'HGDM24', 500);
+INSERT INTO Contract VALUES('RJ-HG-05', 592845832, 'HGDM24', 700);
+INSERT INTO Contract VALUES('RJ-HG-06',	233063395, 'HGDM24', 540);
+INSERT INTO Contract VALUES('RJ-QB-01',	286306521, 'QBDM24', 10000);
+INSERT INTO Contract VALUES('RJ-CP-01', 739203475, 'CPJP24', 8000);
+INSERT INTO Contract VALUES('RJ-CT-01',	518151596, 'CTJP24', 100);
+
+
+INSERT INTO Vendor VALUES(286306521, 'Sao Mai Technologies', 0987654321, 'bluemoon.night@gmail.com', 'Maplewood Lane', 1029487356, 1358274);
+INSERT INTO Vendor VALUES(203524182, 'Viet Phong Logistics', 0912345678, 'wandering.coder@gmail.com', 'Sunset Ridge Drive', 1847129035, 9641083);
+INSERT INTO Vendor VALUES(554681169, 'An Thinh Construction', 0900987654, 'sunshine.baker@gmail.com', 'Kingfisher Court', 1563210479, 7205196);
+INSERT INTO Vendor VALUES(172727832, 'Sen Vang Investment', 0956321478,	'happy.trekker@gmail.com', 'Elm Street', 1938572016, 8432615);
+INSERT INTO Vendor VALUES(592845832, 'May Hong Advertising', 0937812569, 'curious.cat@gmail.com', 'Victoria Avenue', 1174063825, 6017359);
+INSERT INTO Vendor VALUES(233063395, 'Binh Minh Trading', 0924108357, 'stargazer.88@gmail.com', 'Argyle Road', 1320851694, 5893241);
+INSERT INTO Vendor VALUES(418153757, 'Phuc Loc Tho Holdings', 0968532140, 'bookworm.life@gmail.com', 'Clancy Lane', 1659734208, 2170486);
+INSERT INTO Vendor VALUES(211042098, 'Kien Giang Seafood', 0949721635, 'melody.maker@gmail.com', 'Harrington Street', 1481306729, 4096318);
+INSERT INTO Vendor VALUES(661357255, 'Dong A Technology', 0910387246, 'green.thumb@gmail.com', 'Chrysanthemum Drive', 1712598360, 1035872);
+INSERT INTO Vendor VALUES(739203475, 'Song Viet Software', 0975214893, 'history.buff@gmail.com', 'Bondi Beach Road', 1265049183, 3951726);
+INSERT INTO Vendor VALUES(518151596, 'Indosun', 0908643157, 'coffee.lover@gmail.com', 'Evergreen Way', 1098637512, 8724601);
+
+
+										
